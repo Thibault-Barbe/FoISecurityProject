@@ -2,14 +2,12 @@ import { ethers } from "hardhat";
 
 async function main() {
 
-  const tokenCreated: number = 10000000
+  const BaptibToken = await ethers.getContractFactory("BaptibToken");
+  const baptibToken = await BaptibToken.deploy(100000000, 50);
 
-  const ERC20Basic = await ethers.getContractFactory("ERC20Basic");
-  const erc20basic = await ERC20Basic.deploy(tokenCreated);
+  await baptibToken.deployed()
 
-  await erc20basic.deployed();
-
-  console.log(`ERC20Basic is deployed, ${tokenCreated} tokens has been created!`);
+  console.log(`BaptibToken deployed: `, baptibToken.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere
