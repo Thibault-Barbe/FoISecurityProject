@@ -4,10 +4,13 @@ import { basename } from 'path';
 import { useState } from 'react';
 import Web3 from 'web3';
 import {abi} from '../ERC20Basic.json';
+const web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:8545/");
+const newAbi = JSON.stringify(abi)
+const contract = new web3.eth.Contract(JSON.parse(newAbi), '0x5fbdb2315678afecb367f032d93f642f64180aa3')
 
 const Home: NextPage = () => {
   const [accounts, setAccounts] = useState<[string]>([""]);
-  const web3 = new Web3(Web3.givenProvider || "http://127.0.0.1:8545/");
+  const [balance, setBalance] = useState<number>(0);
 
   const connectMetamask = async () => {
     if (window.ethereum) {
@@ -17,6 +20,7 @@ const Home: NextPage = () => {
       })
       setAccounts(res);
       console.log(res);
+      setBalance(await contract.methods.balanceOf(res[0]).call());
     } else {
       console.log("can't connect to metamask because the plugin is not installed");
     }
@@ -31,16 +35,8 @@ const Home: NextPage = () => {
     }
   }
 
-  const getWeb = async() => {
-    var newAbi = JSON.stringify(abi)
-    var contract = new web3.eth.Contract(JSON.parse(newAbi), '0x5fbdb2315678afecb367f032d93f642f64180aa3')
-    console.log(accounts[0])
-    console.log('Balance:')
-    console.log(await contract.methods.balanceOf(accounts[0]).call())
-    console.log(await contract.methods.balanceOf('0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266').call())
-    await contract.methods.transferFrom('0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266', accounts[0], 10).call()
-    console.log('New Balance:')
-    console.log(await contract.methods.balanceOf(accounts[0]).call())
+  const getBalance = async() => {
+    setBalance(await contract.methods.balanceOf(accounts[0]).call());
   }
 
   return (
@@ -56,19 +52,10 @@ const Home: NextPage = () => {
       <div className='flex items-center justify-center flex-col w-[60%]'>
         <img className='mb-12' width={400} src='/metamask.svg'></img>
         <div className='flex flex-col space-y-6 items-center w-full'>
-          <h1 className='uppercase font-bold text-[24px]'>{"Send token to: "}</h1>
-          <div className='flex flex-col w-full'>
-            <h1 className='pb-2 pl-2 font-bold'>Address:</h1>
-            <input id='address' type="text" className='w-full p-2 bg-gray-200 rounded-xl border-2 border-black'/>
-          </div>
-          <div className='flex flex-col w-full'>
-            <h1 className='pb-2 pl-2 font-bold'>Amount:</h1>
-            <input id='amount' type="number" className='w-full p-2 bg-gray-200 rounded-xl border-2 border-black'/>
-          </div>
-          <button className='py-4 px-10 bg-orange-500 rounded-full w-[40%]' onClick={() => sendToken()}>Send</button>
+          <h1 className='uppercase font-bold text-[24px]'>{"Your balance: " + balance}</h1>
+          <button className='py-4 px-10 bg-orange-500 rounded-full w-[40%]' onClick={() => getBalance()}>refresh Balance</button>
         </div>
       </div>
-      <button className='py-4 px-10 bg-orange-500 rounded-full w-[40%]' onClick={() => getWeb()}>getWeb</button>
       </>
     ) : (
       <button className='w-[200px] py-7 bg-blue-400 text-white' onClick={() => connectMetamask()}>Connect my wallet</button>
