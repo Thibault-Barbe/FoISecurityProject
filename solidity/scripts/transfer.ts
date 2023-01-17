@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 const contract = require('../artifacts/contracts/ERC20Basic.sol/ERC20Basic.json')
 const CONTRACT_ADRESS = "0x5fbdb2315678afecb367f032d93f642f64180aa3"
 const TO_TRANSFER = 10
-const RECEIVER = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+const RECEIVER = "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"
 
 async function main() {
     const signers = await ethers.getSigners()
